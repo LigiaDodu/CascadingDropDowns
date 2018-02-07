@@ -8,7 +8,7 @@
 @model  SecondaryLevelFilters.Models.CascadingModel
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!DOCTYPE html>
@@ -17,9 +17,15 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js" type="text/javascript"></script>
 </head>
 <body>
-    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+    @using (Ajax.BeginForm("Index",  new AjaxOptions {
+        HttpMethod = "POST",
+        UpdateTargetId = "statesList",
+        LoadingElementId = "loading"
+    }))
     {
         @Html.DropDownListFor(m => m.CountryId, Model.Countries)
       
@@ -28,9 +34,18 @@
         @Html.DropDownListFor(m => m.CityId, Model.Cities)
         
         <input type="submit" value="Submit" />
+
+        <div id="loading" style="display:none">
+            <img src="~/Images/ajax-loader.gif" />
+        </div>
+        <div id="statesList">
+            @Html.Partial("_States", Model.States)
+        </div>
+
     }
-    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript">
+   
+    
+    @*<script type="text/javascript">
         $(function () {
             $("select").each(function () {
                 if ($(this).find("option").length <= 1) {
@@ -102,6 +117,6 @@
                 alert(message);
             }
         });
-    </script>
+    </script>*@
 </body>
 </html>

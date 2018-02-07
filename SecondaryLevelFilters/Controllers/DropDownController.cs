@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using SecondaryLevelFilters.Models;
+using System.Threading;
 
 namespace SecondaryLevelFilters.Controllers 
 {
@@ -51,10 +52,25 @@ namespace SecondaryLevelFilters.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public ActionResult Index(CascadingModel model)
+        {
+            Thread.Sleep(2000);
+           
+            if (Request.IsAjaxRequest())
+            {
+                Random rnd = new Random();
+                int randomNumber = rnd.Next(1, 4);
+                var states = GetStatesListByCountryId(randomNumber);
+                return PartialView("_States", states);
+            }
+            
+            return View(model);
+        }
         public List<SelectListItem> GetStatesListByCountryId(int countryid)
         {
-          //var list = States.Where(x => x.Country.Id == countryid).ToList();
-            return CreateSelectList(States, x => x.Id, x => x.Name);
+            //var list = States.Where(x => x.Country.Id == countryid).ToList();
+            return CreateSelectList(States.Take(countryid).ToList(), x => x.Id, x => x.Name);
         }
 
 
@@ -76,10 +92,10 @@ namespace SecondaryLevelFilters.Controllers
             switch (type)
             {
                 case "CountryId":
-                    model.States = CreateSelectList(States.Take(2).ToList(), x => x.Id, x => x.Name);
+                    model.States = CreateSelectList(States.Take(value).ToList(), x => x.Id, x => x.Name);
                     break;
                 case "StateId":
-                    model.Cities = CreateSelectList(Cities.Take(2).ToList(), x => x.Id, x => x.Name);
+                    model.Cities = CreateSelectList(Cities.Take(value).ToList(), x => x.Id, x => x.Name);
                     break;
             }
             return Json(model);
